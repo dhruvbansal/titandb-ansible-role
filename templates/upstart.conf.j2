@@ -1,0 +1,17 @@
+description "titandb"
+
+exec 2>&1
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+respawn limit 10 5
+
+console log
+
+setuid {{ titandb_user_name  }}
+setgid {{ titandb_user_group }}
+
+cd {{ titandb_home_dir }}
+exec ./bin/rexter.sh

@@ -1,0 +1,37 @@
+---
+
+titandb_download_dir: /usr/local/src/
+titandb_home_dir_root: /usr/local/share
+titandb_home_dir: /usr/local/share/titandb
+titandb_data_dir:
+
+titandb_version: 0.5.1
+titandb_hadoop_version: 2
+titandb_release_basename: "titan-{{ titandb_version }}-hadoop{{ titandb_hadoop_version }}.zip"
+titandb_release_url: "http://s3.thinkaurelius.com/downloads/titan/{{ titandb_release_basename }}"
+
+titandb_group_name: titandb
+titandb_group_gid:  204
+titandb_user_name: titandb
+titandb_user_comment: "titandb user"
+titandb_user_uid: 204
+titandb_user_group: titandb
+titandb_user_groups: 
+titandb_user_shell: /bin/false
+
+titandb_state: started
+titandb_enable: yes
+
+titandb_storage_backend: local
+titandb_storage_hostnames: 
+
+titandb_db_cache: true
+titandb_db_cache_clean_wait: 20
+titandb_db_cache_time: 180000
+titandb_db_cache_size: 0.25
+
+titandb_search_backend: elasticsearch
+titandb_search_hostnames: 127.0.0.1
+
+titandb_search_elasticsearch_client_only: true
+titandb_search_elasticsearch_interface: TRANSPORT_CLIENT

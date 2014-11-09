@@ -1,0 +1,41 @@
+---
+
+- name: Download release
+  get_url: url="{{ titandb_release_url }}" dest="{{ titandb_download_dir }}/{{ titandb_release_basename }}"
+
+- name: Unzip release
+  command: "unzip {{ titandb_download_dir }}/{{ titandb_release_basename }}"
+  args:
+    chdir: "{{ titandb_home_dir_root }}"
+    creates: "{{ titandb_home_dir_root }}/titan-{{ titandb_version }}-hadoop{{ titandb_hadoop_version }}"
+
+- name: Link release
+  file: path="{{ titandb_home_dir }}" state=link src="{{ titandb_home_dir_root }}/titan-{{ titandb_version }}-hadoop{{ titandb_hadoop_version }}" owner=root group=root mode=0755
+
+- name: Create group
+  group: name={{ titandb_group_name }} gid={{ titandb_group_gid }}
+  # notify:
+  #   - restart titandb
+
+- name: Create user home directory
+  file: path={{ titandb_home_dir }} state=directory owner={{ titandb_user_name }} group={{ titandb_user_group}} mode=0755
+
+- name: Create user
+  user: name={{ titandb_user_name }} comment="{{ titandb_user_comment }}" uid={{ titandb_user_uid }} group={{ titandb_user_group }} groups={{ titandb_user_groups }} shell={{ titandb_user_shell }} home={{ titandb_home_dir }}
+  # notify:
+  #   - restart titandb
+
+- name: Create configuration directory
+  file: dest={{ titandb_conf_dir }} state=directory owner=root group=root mode=0755
+    
+- name: Create configuration file
+  template: src=titandb.properties.j2 dest="{{ titandb_conf_dir }}/titandb.properties" owner=root group=root mode=0644
+
+# - name: Create upstart configuration file
+#   template: src=upstart.conf.j2 dest=/etc/init/titandb.conf owner=root group=root mode=0644
+#   when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu" 
+#   notify:
+#     - restart titandb
+
+# - name: Start titandb
+#   service: name=titandb state={{titandb_state}} enabled={{ titandb_enable }}

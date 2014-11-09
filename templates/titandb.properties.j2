@@ -1,0 +1,1886 @@
+
+#
+# == attributes ==
+#
+
+# Enables Titan to persist any valid data type. Disabling this option
+# restricts data types to native types and explicitlyregistered ones.
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: GLOBAL_OFFLINE
+# 
+#attributes.allow-all=true
+{% if titandb_attributes_allow_all is defined %}
+attributes.allow-all={{ titandb_attributes_allow_all }}
+{% endif %}
+
+#
+# == cache ==
+#
+
+# Whether to enable Titan’s database-level cache, which is shared across all
+# transactions. Enabling this option speeds up traversals by holding hot graph
+# elements in memory, but also increases the likelihood of reading stale data. 
+# Disabling it forces each transaction to independently fetch graph elements
+# from storage before reading/writing them.
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#cache.db-cache=false
+{% if titandb_cache_db_cache is defined %}
+cache.db-cache={{ titandb_cache_db_cache }}
+{% endif %}
+
+# How long, in milliseconds, database-level cache will keep entries after
+# flushing them.  This option is only useful on distributed storage backends
+# that are capable of acknowledging writes without necessarily making them
+# immediately visible.
+#
+# Default:    50
+# Data Type:  Integer
+# Mutability: GLOBAL_OFFLINE
+# 
+#cache.db-cache-clean-wait=50
+{% if titandb_cache_db_cache_clean_wait is defined %}
+cache.db-cache-clean-wait={{ titandb_cache_db_cache_clean_wait }}
+{% endif %}
+
+# Size of Titan’s database level cache.  Values between 0 and 1 are
+# interpreted as a percentage of VM heap, while larger values are interpreted
+# as an absolute size in bytes.
+#
+# Default:    0.3
+# Data Type:  Double
+# Mutability: MASKABLE
+# 
+#cache.db-cache-size=0.3
+{% if titandb_cache_db_cache_size is defined %}
+cache.db-cache-size={{ titandb_cache_db_cache_size }}
+{% endif %}
+
+# Default expiration time, in milliseconds, for entries in the database-level
+# cache. Entries are evicted when they reach this age even if the cache has
+# room to spare. Set to 0 to disable expiration (cache entries live forever or
+# until memory pressure triggers eviction when set to 0).
+#
+# Default:    10000
+# Data Type:  Long
+# Mutability: GLOBAL_OFFLINE
+# 
+#cache.db-cache-time=10000
+{% if titandb_cache_db_cache_time is defined %}
+cache.db-cache-time={{ titandb_cache_db_cache_time }}
+{% endif %}
+
+# Maximum size of the transaction-level cache of recently-used vertices.
+#
+# Default:    20000
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#cache.tx-cache-size=20000
+{% if titandb_cache_tx_cache_size is defined %}
+cache.tx-cache-size={{ titandb_cache_tx_cache_size }}
+{% endif %}
+
+# Initial size of the transaction-level cache of uncommitted dirty vertices.
+# This is a performance hint for write-heavy, performance-sensitive
+# transactional workloads. If set, it should roughly match the median vertices
+# modified per transaction.
+#
+# Default:    (no default value)
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#cache.tx-dirty-size=(no default value)
+{% if titandb_cache_tx_dirty_size is defined %}
+cache.tx-dirty-size={{ titandb_cache_tx_dirty_size }}
+{% endif %}
+
+
+#
+# == cluster ==
+#
+
+# The number of virtual partition blocks created in the partitioned graph.
+# This should be larger than the maximum expected number of nodesin the Titan
+# graph cluster. Must be bigger than 1 and a power of 2.
+#
+# Default:    64
+# Data Type:  Integer
+# Mutability: FIXED
+# 
+#cluster.max-partitions=64
+{% if titandb_cluster_max_partitions is defined %}
+cluster.max-partitions={{ titandb_cluster_max_partitions }}
+{% endif %}
+
+# Whether the graph’s element should be randomly distributed across the
+# cluster (true) or explicitly allocated to individual partition blocks based
+# on the configured graph partitioner (false). Unless explicitly set, this
+# defaults false for stores that hash keys and defaults true for stores that
+# preserve key order (such as HBase and Cassandra with ByteOrderedPartitioner).
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: FIXED
+# 
+#cluster.partition=false
+{% if titandb_cluster_partition is defined %}
+cluster.partition={{ titandb_cluster_partition }}
+{% endif %}
+
+
+#
+# == graph ==
+#
+
+# Whether to allow the local and storage-backend-hosted copies of the
+# configuration to contain conflicting values for options with any of the
+# following types: FIXED, GLOBAL_OFFLINE, GLOBAL.  These types are managed
+# globally through the storage backend and cannot be overridden by changing the
+# local configuration.  This type of conflict usually indicates
+# misconfiguration.  When this option is true, Titan will log these option
+# conflicts, but continue normal operation using the storage-backend-hosted
+# value for each conflicted option.  When this option is false, Titan will log
+# these option conflicts, but then it will throw an exception, refusing to
+# start.
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#graph.allow-stale-config=true
+{% if titandb_graph_allow_stale_config is defined %}
+graph.allow-stale-config={{ titandb_graph_allow_stale_config }}
+{% endif %}
+
+# Whether user provided vertex ids should be enabled and Titan’s automatic id
+# allocation be disabled. Useful when operating Titan in concert with another
+# storage system that assigns long ids but disables someof Titan’s advanced
+# features which can lead to inconsistent data. EXPERT FEATURE - USE WITH GREAT
+# CARE.
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: FIXED
+# 
+#graph.set-vertex-id=false
+{% if titandb_graph_set_vertex_id is defined %}
+graph.set-vertex-id={{ titandb_graph_set_vertex_id }}
+{% endif %}
+
+# The timestamp resolution to use when writing to storage and indices. Sets
+# the time granularity for the entire graph cluster. To avoid potential
+# inaccuracies, the configured time resolution should match those of the
+# backend systems. Some Titan storage backends declare a preferred timestamp
+# resolution that reflects design constraints in the underlying service. When
+# the backend provides a preferred default, and when this setting is not
+# explicitly declared in the config file, the backend default is used and the
+# general default associated with this setting is ignored.  An explicit
+# declaration of this setting overrides both the general and backend-specific
+# defaults.
+#
+# Default:    MICRO
+# Data Type:  Timestamps
+# Mutability: FIXED
+# 
+#graph.timestamps=MICRO
+{% if titandb_graph_timestamps is defined %}
+graph.timestamps={{ titandb_graph_timestamps }}
+{% endif %}
+
+# Unique identifier for this Titan instance.  This must be unique among all
+# instances concurrently accessing the same stores or indexes.  It’s
+# automatically generated by concatenating the hostname, process id, and a
+# static (process-wide) counter. Leaving it unset is recommended.
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#graph.unique-instance-id=(no default value)
+{% if titandb_graph_unique_instance_id is defined %}
+graph.unique-instance-id={{ titandb_graph_unique_instance_id }}
+{% endif %}
+
+# When this is set and unique-instance-id is not, this Titan instance’s unique
+# identifier is generated by concatenating the hostname to the provided number.
+#  This is a legacy option which is currently only useful if the JVM’s
+# ManagementFactory.getRuntimeMXBean().getName() is not unique between
+# processes.
+#
+# Default:    (no default value)
+# Data Type:  Short
+# Mutability: LOCAL
+# 
+#graph.unique-instance-id-suffix=(no default value)
+{% if titandb_graph_unique_instance_id_suffix is defined %}
+graph.unique-instance-id-suffix={{ titandb_graph_unique_instance_id_suffix }}
+{% endif %}
+
+
+#
+# == ids ==
+#
+
+# Globally reserve graph element IDs in chunks of this size.  Setting this too
+# low will make commits frequently block on slow reservation requests.  Setting
+# it too high will result in IDs wasted when a graph instance shuts down with
+# reserved but mostly-unused blocks.
+#
+# Default:    10000
+# Data Type:  Integer
+# Mutability: GLOBAL_OFFLINE
+# 
+#ids.block-size=10000
+{% if titandb_ids_block_size is defined %}
+ids.block-size={{ titandb_ids_block_size }}
+{% endif %}
+
+# When true, vertices and edges are assigned IDs immediately upon creation. 
+# When false, IDs are assigned only when the transaction commits. Must be
+# disabled for graph partitioning to work.
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#ids.flush=true
+{% if titandb_ids_flush is defined %}
+ids.flush={{ titandb_ids_flush }}
+{% endif %}
+
+# Number of partition block to allocate for placement of vertices
+#
+# Default:    10
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#ids.num-partitions=10
+{% if titandb_ids_num_partitions is defined %}
+ids.num-partitions={{ titandb_ids_num_partitions }}
+{% endif %}
+
+# Name of the vertex placement strategy or full class name
+#
+# Default:    simplebulk
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#ids.placement=simplebulk
+{% if titandb_ids_placement is defined %}
+ids.placement={{ titandb_ids_placement }}
+{% endif %}
+
+# When the most-recently-reserved ID block has only this percentage of its
+# total IDs remaining (expressed as a value between 0 and 1), Titan
+# asynchronously begins reserving another block. This helps avoid transaction
+# commits waiting on ID reservation even if the block size is relatively small.
+#
+# Default:    0.3
+# Data Type:  Double
+# Mutability: MASKABLE
+# 
+#ids.renew-percentage=0.3
+{% if titandb_ids_renew_percentage is defined %}
+ids.renew-percentage={{ titandb_ids_renew_percentage }}
+{% endif %}
+
+# The number of milliseconds that the Titan id pool manager will wait before
+# giving up on allocating a new block of ids
+#
+# Default:    120000 ms
+# Data Type:  Duration
+# Mutability: MASKABLE
+# 
+#ids.renew-timeout=120000 ms
+{% if titandb_ids_renew_timeout is defined %}
+ids.renew-timeout={{ titandb_ids_renew_timeout }}
+{% endif %}
+
+
+#
+# == ids.authority ==
+#
+
+# This setting helps separate Titan instances sharing a single graph storage
+# backend avoid contention when reserving ID blocks, increasing overall
+# throughput.
+#
+# Default:    NONE
+# Data Type:  ConflictAvoidanceMode
+# Mutability: GLOBAL_OFFLINE
+# 
+#ids.authority.conflict-avoidance-mode=NONE
+{% if titandb_ids_authority_conflict_avoidance_mode is defined %}
+ids.authority.conflict-avoidance-mode={{ titandb_ids_authority_conflict_avoidance_mode }}
+{% endif %}
+
+# Conflict avoidance tag to be used by this Titan instance when allocating IDs
+#
+# Default:    0
+# Data Type:  Integer
+# Mutability: LOCAL
+# 
+#ids.authority.conflict-avoidance-tag=0
+{% if titandb_ids_authority_conflict_avoidance_tag is defined %}
+ids.authority.conflict-avoidance-tag={{ titandb_ids_authority_conflict_avoidance_tag }}
+{% endif %}
+
+# Configures the number of bits of Titan-assigned element IDs that are
+# reserved for the conflict avoidance tag
+#
+# Default:    5
+# Data Type:  Integer
+# Mutability: FIXED
+# 
+#ids.authority.conflict-avoidance-tag-bits=5
+{% if titandb_ids_authority_conflict_avoidance_tag_bits is defined %}
+ids.authority.conflict-avoidance-tag-bits={{ titandb_ids_authority_conflict_avoidance_tag_bits }}
+{% endif %}
+
+# Number of times the system attempts ID block reservations with random
+# conflict avoidance tags before giving up and throwing an exception
+#
+# Default:    5
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#ids.authority.randomized-conflict-avoidance-retries=5
+{% if titandb_ids_authority_randomized_conflict_avoidance_retries is defined %}
+ids.authority.randomized-conflict-avoidance-retries={{ titandb_ids_authority_randomized_conflict_avoidance_retries }}
+{% endif %}
+
+# The number of milliseconds the system waits for an ID block reservation to
+# be acknowledged by the storage backend
+#
+# Default:    300 ms
+# Data Type:  Duration
+# Mutability: GLOBAL_OFFLINE
+# 
+#ids.authority.wait-time=300 ms
+{% if titandb_ids_authority_wait_time is defined %}
+ids.authority.wait-time={{ titandb_ids_authority_wait_time }}
+{% endif %}
+
+
+#
+# == index * ==
+#
+
+# The indexing backend used to extend and optimize Titan’s query
+# functionality. This setting is optional.  Titan can use multiple
+# heterogeneous index backends.  Hence, this option can appear more than once,
+# so long as the user-defined name between "index" and "backend" is unique
+# among appearances.Similar to the storage backend, this should be set to one
+# of Titan’s built-in shorthand names for its standard index backends
+# (shorthands: lucene, solr, es, elasticsearch) or to the full package and
+# classname of a custom/third-party IndexProvider implementation.
+#
+# Default:    elasticsearch
+# Data Type:  String
+# Mutability: GLOBAL_OFFLINE
+# 
+#index.search.backend=elasticsearch
+{% if titandb_index_search_backend is defined %}
+index.search.backend={{ titandb_index_search_backend }}
+{% endif %}
+
+# Path to a configuration file for those indexing backends that
+# require/support a separate config file
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#index.search.conf-file=(no default value)
+{% if titandb_index_search_conf_file is defined %}
+index.search.conf-file={{ titandb_index_search_conf_file }}
+{% endif %}
+
+# Directory to store index data locally
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: GLOBAL_OFFLINE
+# 
+#index.search.directory=(no default value)
+{% if titandb_index_search_directory is defined %}
+index.search.directory={{ titandb_index_search_directory }}
+{% endif %}
+
+# The hostname or comma-separated list of hostnames of index backend servers. 
+# This is only applicable to some index backends, such as elasticsearch and
+# solr.
+#
+# Default:    127.0.0.1
+# Data Type:  String[]
+# Mutability: GLOBAL
+# 
+#index.search.hostname=127.0.0.1
+{% if titandb_index_search_hostname is defined %}
+index.search.hostname={{ titandb_index_search_hostname }}
+{% endif %}
+
+# Name of the index if required by the indexing backend
+#
+# Default:    titan
+# Data Type:  String
+# Mutability: GLOBAL_OFFLINE
+# 
+#index.search.index-name=titan
+{% if titandb_index_search_index_name is defined %}
+index.search.index-name={{ titandb_index_search_index_name }}
+{% endif %}
+
+# Whether to use the name of the property key as the field name in the index.
+# It must be ensured, that theindexed property key names are valid field names.
+# Renaming the property key will NOT rename the field.
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: GLOBAL
+# 
+#index.search.map-name=false
+{% if titandb_index_search_map_name is defined %}
+index.search.map-name={{ titandb_index_search_map_name }}
+{% endif %}
+
+# Maxium number of results to return if no limit is specified
+#
+# Default:    100000
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#index.search.max-result-set-size=100000
+{% if titandb_index_search_max_result_set_size is defined %}
+index.search.max-result-set-size={{ titandb_index_search_max_result_set_size }}
+{% endif %}
+
+# The port on which to connect to index backend servers
+#
+# Default:    (no default value)
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#index.search.port=(no default value)
+{% if titandb_index_search_port is defined %}
+index.search.port={{ titandb_index_search_port }}
+{% endif %}
+
+
+#
+# == index.search.elasticsearch ==
+#
+
+# The Elasticsearch node.client option is set to this boolean value, and the
+# Elasticsearch node.data option is set to the negation of this value.  True
+# creates a thin client which holds no data.  False creates a regular
+# Elasticsearch cluster node that may store data.
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: GLOBAL_OFFLINE
+# 
+#index.search.elasticsearch.client-only=true
+{% if titandb_index_search_elasticsearch_client_only is defined %}
+index.search.elasticsearch.client-only={{ titandb_index_search_elasticsearch_client_only }}
+{% endif %}
+
+# The name of the Elasticsearch cluster.  This should match the "cluster.name"
+# setting in the Elasticsearch nodes' configuration.
+#
+# Default:    elasticsearch
+# Data Type:  String
+# Mutability: GLOBAL_OFFLINE
+# 
+#index.search.elasticsearch.cluster-name=elasticsearch
+{% if titandb_index_search_elasticsearch_cluster_name is defined %}
+index.search.elasticsearch.cluster-name={{ titandb_index_search_elasticsearch_cluster_name }}
+{% endif %}
+
+# When Titan initializes its ES backend, Titan waits up to this duration for
+# the ES cluster health to reach at least yellow status.  This string should be
+# formatted as a natural number followed by the lowercase letter "s", e.g. 3s
+# or 60s.
+#
+# Default:    30s
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#index.search.elasticsearch.health-request-timeout=30s
+{% if titandb_index_search_elasticsearch_health_request_timeout is defined %}
+index.search.elasticsearch.health-request-timeout={{ titandb_index_search_elasticsearch_health_request_timeout }}
+{% endif %}
+
+# Whether to bypass validation of the cluster name of connected nodes.  This
+# option is only used on the interface configuration track (see manual for
+# information about ES config tracks).
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#index.search.elasticsearch.ignore-cluster-name=true
+{% if titandb_index_search_elasticsearch_ignore_cluster_name is defined %}
+index.search.elasticsearch.ignore-cluster-name={{ titandb_index_search_elasticsearch_ignore_cluster_name }}
+{% endif %}
+
+# Whether to connect to ES using the Node or Transport client (see the
+# "Talking to Elasticsearch" section of the ES manual for discussion of the
+# difference).  Setting this option enables the interface config track (see
+# manual for more information about ES config tracks).
+#
+# Default:    TRANSPORT_CLIENT
+# Data Type:  ElasticSearchSetup
+# Mutability: MASKABLE
+# 
+#index.search.elasticsearch.interface=TRANSPORT_CLIENT
+{% if titandb_index_search_elasticsearch_interface is defined %}
+index.search.elasticsearch.interface={{ titandb_index_search_elasticsearch_interface }}
+{% endif %}
+
+# Whether ES’s Node client will internally attempt to load default
+# configuration settings from system properties/process environment variables. 
+# Only meaningful when using the Node client (has no effect with
+# TransportClient).
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#index.search.elasticsearch.load-default-node-settings=true
+{% if titandb_index_search_elasticsearch_load_default_node_settings is defined %}
+index.search.elasticsearch.load-default-node-settings={{ titandb_index_search_elasticsearch_load_default_node_settings }}
+{% endif %}
+
+# On the legacy config track, this option chooses between starting a
+# TransportClient (false) or a Node with JVM-local transport and local data
+# (true).  On the interface config track, this option is considered by (but
+# optional for) the Node client and ignored by the TransportClient.  See the
+# manual for more information about ES config tracks.
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: GLOBAL_OFFLINE
+# 
+#index.search.elasticsearch.local-mode=false
+{% if titandb_index_search_elasticsearch_local_mode is defined %}
+index.search.elasticsearch.local-mode={{ titandb_index_search_elasticsearch_local_mode }}
+{% endif %}
+
+# Whether to enable cluster sniffing.  This option only applies to the
+# TransportClient.  Enabling this option makes the TransportClient attempt to
+# discover other cluster nodes besides those in the initial host list provided
+# at startup.
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#index.search.elasticsearch.sniff=true
+{% if titandb_index_search_elasticsearch_sniff is defined %}
+index.search.elasticsearch.sniff={{ titandb_index_search_elasticsearch_sniff }}
+{% endif %}
+
+# The period of time between runs of ES’s bulit-in expired document deleter. 
+# This string will become the value of ES’s indices.ttl.interval setting and
+# should be formatted accordingly, e.g. 5s or 60s.
+#
+# Default:    5s
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#index.search.elasticsearch.ttl-interval=5s
+{% if titandb_index_search_elasticsearch_ttl_interval is defined %}
+index.search.elasticsearch.ttl-interval={{ titandb_index_search_elasticsearch_ttl_interval }}
+{% endif %}
+
+#
+# == metrics ==
+#
+
+# Whether to enable basic timing and operation count monitoring on backend
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#metrics.enabled=false
+{% if titandb_metrics_enabled is defined %}
+metrics.enabled={{ titandb_metrics_enabled }}
+{% endif %}
+
+# Whether to aggregate measurements for the edge store, vertex index, edge
+# index, and ID store
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#metrics.merge-stores=true
+{% if titandb_metrics_merge_stores is defined %}
+metrics.merge-stores={{ titandb_metrics_merge_stores }}
+{% endif %}
+
+# The default name prefix for Metrics reported by Titan.
+#
+# Default:    com.thinkaurelius.titan
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.prefix=com.thinkaurelius.titan
+{% if titandb_metrics_prefix is defined %}
+metrics.prefix={{ titandb_metrics_prefix }}
+{% endif %}
+
+
+#
+# == metrics.console ==
+#
+
+# Time between Metrics reports printing to the console, in milliseconds
+#
+# Default:    (no default value)
+# Data Type:  Duration
+# Mutability: MASKABLE
+# 
+#metrics.console.interval=(no default value)
+{% if titandb_metrics_console_interval is defined %}
+metrics.console.interval={{ titandb_metrics_console_interval }}
+{% endif %}
+
+
+#
+# == metrics.csv ==
+#
+
+# Metrics CSV output directory
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.csv.directory=(no default value)
+{% if titandb_metrics_csv_directory is defined %}
+metrics.csv.directory={{ titandb_metrics_csv_directory }}
+{% endif %}
+
+# Time between dumps of CSV files containing Metrics data, in milliseconds
+#
+# Default:    (no default value)
+# Data Type:  Duration
+# Mutability: MASKABLE
+# 
+#metrics.csv.interval=(no default value)
+{% if titandb_metrics_csv_interval is defined %}
+metrics.csv.interval={{ titandb_metrics_csv_interval }}
+{% endif %}
+
+
+#
+# == metrics.ganglia ==
+#
+
+# Whether to communicate to Ganglia via uni- or multicast
+#
+# Default:    unicast
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.ganglia.addressing-mode=unicast
+{% if titandb_metrics_ganglia_addressing_mode is defined %}
+metrics.ganglia.addressing-mode={{ titandb_metrics_ganglia_addressing_mode }}
+{% endif %}
+
+# The unicast host or multicast group name to which Metrics will send Ganglia
+# data
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.ganglia.hostname=(no default value)
+{% if titandb_metrics_ganglia_hostname is defined %}
+metrics.ganglia.hostname={{ titandb_metrics_ganglia_hostname }}
+{% endif %}
+
+# The number of milliseconds to wait between sending Metrics data to Ganglia
+#
+# Default:    (no default value)
+# Data Type:  Duration
+# Mutability: MASKABLE
+# 
+#metrics.ganglia.interval=(no default value)
+{% if titandb_metrics_ganglia_interval is defined %}
+metrics.ganglia.interval={{ titandb_metrics_ganglia_interval }}
+{% endif %}
+
+# The port to which Ganglia data are sent
+#
+# Default:    8649
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#metrics.ganglia.port=8649
+{% if titandb_metrics_ganglia_port is defined %}
+metrics.ganglia.port={{ titandb_metrics_ganglia_port }}
+{% endif %}
+
+# Whether to send data to Ganglia in the 3.1 protocol format
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#metrics.ganglia.protocol-31=true
+{% if titandb_metrics_ganglia_protocol_31 is defined %}
+metrics.ganglia.protocol-31={{ titandb_metrics_ganglia_protocol_31 }}
+{% endif %}
+
+# If non-null, it must be a valid Gmetric spoof string formatted as an
+# IP:hostname pair. See
+# http://sourceforge.net/apps/trac/ganglia/wiki/gmetric_spoofing for
+# information about this setting.
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.ganglia.spoof=(no default value)
+{% if titandb_metrics_ganglia_spoof is defined %}
+metrics.ganglia.spoof={{ titandb_metrics_ganglia_spoof }}
+{% endif %}
+
+# The multicast TTL to set on outgoing Ganglia datagrams
+#
+# Default:    1
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#metrics.ganglia.ttl=1
+{% if titandb_metrics_ganglia_ttl is defined %}
+metrics.ganglia.ttl={{ titandb_metrics_ganglia_ttl }}
+{% endif %}
+
+# The host UUID to set on outgoing Ganglia datagrams. See
+# https://github.com/ganglia/monitor-core/wiki/UUIDSources for information
+# about this setting.
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#metrics.ganglia.uuid=(no default value)
+{% if titandb_metrics_ganglia_uuid is defined %}
+metrics.ganglia.uuid={{ titandb_metrics_ganglia_uuid }}
+{% endif %}
+
+
+#
+# == metrics.graphite ==
+#
+
+# The hostname to receive Graphite plaintext protocol metric data
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.graphite.hostname=(no default value)
+{% if titandb_metrics_graphite_hostname is defined %}
+metrics.graphite.hostname={{ titandb_metrics_graphite_hostname }}
+{% endif %}
+
+# The number of milliseconds to wait between sending Metrics data
+#
+# Default:    (no default value)
+# Data Type:  Duration
+# Mutability: MASKABLE
+# 
+#metrics.graphite.interval=(no default value)
+{% if titandb_metrics_graphite_interval is defined %}
+metrics.graphite.interval={{ titandb_metrics_graphite_interval }}
+{% endif %}
+
+# The port to which Graphite data are sent
+#
+# Default:    2003
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#metrics.graphite.port=2003
+{% if titandb_metrics_graphite_port is defined %}
+metrics.graphite.port={{ titandb_metrics_graphite_port }}
+{% endif %}
+
+# A Graphite-specific prefix for reported metrics
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.graphite.prefix=(no default value)
+{% if titandb_metrics_graphite_prefix is defined %}
+metrics.graphite.prefix={{ titandb_metrics_graphite_prefix }}
+{% endif %}
+
+
+#
+# == metrics.jmx ==
+#
+
+# The JMX agentId used by Metrics
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.jmx.agentid=(no default value)
+{% if titandb_metrics_jmx_agentid is defined %}
+metrics.jmx.agentid={{ titandb_metrics_jmx_agentid }}
+{% endif %}
+
+# The JMX domain in which to report Metrics
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.jmx.domain=(no default value)
+{% if titandb_metrics_jmx_domain is defined %}
+metrics.jmx.domain={{ titandb_metrics_jmx_domain }}
+{% endif %}
+
+# Whether to report Metrics through a JMX MBean
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#metrics.jmx.enabled=false
+{% if titandb_metrics_jmx_enabled is defined %}
+metrics.jmx.enabled={{ titandb_metrics_jmx_enabled }}
+{% endif %}
+
+
+#
+# == metrics.slf4j ==
+#
+
+# Time between slf4j logging reports of Metrics data, in milliseconds
+#
+# Default:    (no default value)
+# Data Type:  Duration
+# Mutability: MASKABLE
+# 
+#metrics.slf4j.interval=(no default value)
+{% if titandb_metrics_slf4j_interval is defined %}
+metrics.slf4j.interval={{ titandb_metrics_slf4j_interval }}
+{% endif %}
+
+# The complete name of the Logger through which Metrics will report via Slf4j
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#metrics.slf4j.logger=(no default value)
+{% if titandb_metrics_slf4j_logger is defined %}
+metrics.slf4j.logger={{ titandb_metrics_slf4j_logger }}
+{% endif %}
+
+
+#
+# == query ==
+#
+
+# Whether to pre-fetch all properties on first vertex property access. This
+# can eliminate backend calls on subsequentproperty access for the same vertex
+# at the expense of retrieving all properties at once. This can be expensive
+# for vertices with many properties
+#
+# Default:    (no default value)
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#query.fast-property=(no default value)
+{% if titandb_query_fast_property is defined %}
+query.fast-property={{ titandb_query_fast_property }}
+{% endif %}
+
+# Whether Titan should throw an exception if a graph query cannot be answered
+# using an index. Doing solimits the functionality of Titan’s graph queries but
+# ensures that slow graph queries are avoided on large graphs. Recommended for
+# production use of Titan.
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#query.force-index=false
+{% if titandb_query_force_index is defined %}
+query.force-index={{ titandb_query_force_index }}
+{% endif %}
+
+# Whether to ignore undefined types encountered in user-provided index queries
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#query.ignore-unknown-index-key=false
+{% if titandb_query_ignore_unknown_index_key is defined %}
+query.ignore-unknown-index-key={{ titandb_query_ignore_unknown_index_key }}
+{% endif %}
+
+
+#
+# == schema ==
+#
+
+# Configures the DefaultSchemaMaker to be used by this graph. If set to none,
+# automatic schema creation is disabled. Defaults to a blueprints compatible
+# schema maker with MULTI edge labels and SINGLE property keys
+#
+# Default:    blueprints
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#schema.default=blueprints
+{% if titandb_schema_default is defined %}
+schema.default={{ titandb_schema_default }}
+{% endif %}
+
+
+#
+# == storage ==
+#
+
+# The primary persistence provider used by Titan.  This is required.  It
+# should be set one of Titan’s built-in shorthand names for its standard
+# storage backends (shorthands: berkeleyje, infinispan, cassandrathrift,
+# cassandra, astyanax, hbase, embeddedcassandra, inmemory) or to the full
+# package and classname of a custom/third-party StoreManager implementation.
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.backend=(no default value)
+{% if titandb_storage_backend is defined %}
+storage.backend={{ titandb_storage_backend }}
+{% endif %}
+
+# Whether to enable batch loading into the storage backend
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: LOCAL
+# 
+#storage.batch-loading=false
+{% if titandb_storage_batch_loading is defined %}
+storage.batch-loading={{ titandb_storage_batch_loading }}
+{% endif %}
+
+# Size of the batch in which mutations are persisted
+#
+# Default:    1024
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.buffer-size=1024
+{% if titandb_storage_buffer_size is defined %}
+storage.buffer-size={{ titandb_storage_buffer_size }}
+{% endif %}
+
+# Path to a configuration file for those storage backends which
+# require/support a single separate config file.
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.conf-file=(no default value)
+{% if titandb_storage_conf_file is defined %}
+storage.conf-file={{ titandb_storage_conf_file }}
+{% endif %}
+
+# Default timeout, in milliseconds, when connecting to a remote database
+# instance
+#
+# Default:    10000 ms
+# Data Type:  Duration
+# Mutability: MASKABLE
+# 
+#storage.connection-timeout=10000 ms
+{% if titandb_storage_connection_timeout is defined %}
+storage.connection-timeout={{ titandb_storage_connection_timeout }}
+{% endif %}
+
+# Storage directory for those storage backends that require local storage
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.directory=(no default value)
+{% if titandb_storage_directory is defined %}
+storage.directory={{ titandb_storage_directory }}
+{% endif %}
+
+# The hostname or comma-separated list of hostnames of storage backend
+# servers.  This is only applicable to some storage backends, such as cassandra
+# and hbase.
+#
+# Default:    127.0.0.1
+# Data Type:  String[]
+# Mutability: LOCAL
+# 
+#storage.hostname=127.0.0.1
+{% if titandb_storage_hostname is defined %}
+storage.hostname={{ titandb_storage_hostname }}
+{% endif %}
+
+# Titan break requests that may return many results from distributed storage
+# backends into a series of requests for small chunks/pages of results, where
+# each chunk contains up to this many elements.
+#
+# Default:    100
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.page-size=100
+{% if titandb_storage_page_size is defined %}
+storage.page-size={{ titandb_storage_page_size }}
+{% endif %}
+
+# Whether Titan should attempt to parallelize storage operations
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#storage.parallel-backend-ops=true
+{% if titandb_storage_parallel_backend_ops is defined %}
+storage.parallel-backend-ops={{ titandb_storage_parallel_backend_ops }}
+{% endif %}
+
+# Password to authenticate against backend
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.password=(no default value)
+{% if titandb_storage_password is defined %}
+storage.password={{ titandb_storage_password }}
+{% endif %}
+
+# The port on which to connect to storage backend servers.
+#
+# Default:    (no default value)
+# Data Type:  Integer
+# Mutability: LOCAL
+# 
+#storage.port=(no default value)
+{% if titandb_storage_port is defined %}
+storage.port={{ titandb_storage_port }}
+{% endif %}
+
+# Read-only database
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: LOCAL
+# 
+#storage.read-only=false
+{% if titandb_storage_read_only is defined %}
+storage.read-only={{ titandb_storage_read_only }}
+{% endif %}
+
+# Maximum time (in ms) to wait for a backend read operation to complete
+# successfully. If a backend read operationfails temporarily, Titan will
+# backoff exponentially and retry the operation until the wait time has been
+# exhausted.
+#
+# Default:    10000 ms
+# Data Type:  StandardDuration
+# Mutability: MASKABLE
+# 
+#storage.read-time=10000 ms
+{% if titandb_storage_read_time is defined %}
+storage.read-time={{ titandb_storage_read_time }}
+{% endif %}
+
+# Time in milliseconds for backend manager to wait for the storage backends to
+# become available when Titan is run in server mode
+#
+# Default:    60000 ms
+# Data Type:  Duration
+# Mutability: MASKABLE
+# 
+#storage.setup-wait=60000 ms
+{% if titandb_storage_setup_wait is defined %}
+storage.setup-wait={{ titandb_storage_setup_wait }}
+{% endif %}
+
+# Enables transactions on storage backends that support them
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#storage.transactions=true
+{% if titandb_storage_transactions is defined %}
+storage.transactions={{ titandb_storage_transactions }}
+{% endif %}
+
+# Username to authenticate against backend
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.username=(no default value)
+{% if titandb_storage_username is defined %}
+storage.username={{ titandb_storage_username }}
+{% endif %}
+
+# Maximum time (in ms) to wait for a backend write operation to complete
+# successfully. If a backend write operationfails temporarily, Titan will
+# backoff exponentially and retry the operation until the wait time has been
+# exhausted.
+#
+# Default:    100000 ms
+# Data Type:  StandardDuration
+# Mutability: MASKABLE
+# 
+#storage.write-time=100000 ms
+{% if titandb_storage_write_time is defined %}
+storage.write-time={{ titandb_storage_write_time }}
+{% endif %}
+
+
+#
+# == storage.berkeleydb ==
+#
+
+# Percentage of JVM heap reserved for BerkeleyJE’s cache
+#
+# Default:    65
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.berkeleydb.cache-percentage=65
+{% if titandb_storage_berkeleydb_cache_percentage is defined %}
+storage.berkeleydb.cache-percentage={{ titandb_storage_berkeleydb_cache_percentage }}
+{% endif %}
+
+# The isolation level used by transactions
+#
+# Default:    REPEATABLE_READ
+# Data Type:  IsolationLevel
+# Mutability: MASKABLE
+# 
+#storage.berkeleydb.isolation-level=REPEATABLE_READ
+{% if titandb_storage_berkeleydb_isolation_level is defined %}
+storage.berkeleydb.isolation-level={{ titandb_storage_berkeleydb_isolation_level }}
+{% endif %}
+
+# The BDB record lock mode used for read operations
+#
+# Default:    LockMode.DEFAULT
+# Data Type:  LockMode
+# Mutability: MASKABLE
+# 
+#storage.berkeleydb.lock-mode=LockMode.DEFAULT
+{% if titandb_storage_berkeleydb_lock_mode is defined %}
+storage.berkeleydb.lock-mode={{ titandb_storage_berkeleydb_lock_mode }}
+{% endif %}
+
+
+#
+# == storage.cassandra ==
+#
+
+# True to use Cassandra atomic batch mutation, false to use non-atomic batches
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#storage.cassandra.atomic-batch-mutate=true
+{% if titandb_storage_cassandra_atomic_batch_mutate is defined %}
+storage.cassandra.atomic-batch-mutate={{ titandb_storage_cassandra_atomic_batch_mutate }}
+{% endif %}
+
+# Whether the storage backend should use compression when storing the data
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: FIXED
+# 
+#storage.cassandra.compression=true
+{% if titandb_storage_cassandra_compression is defined %}
+storage.cassandra.compression={{ titandb_storage_cassandra_compression }}
+{% endif %}
+
+# The size of the compression blocks in kilobytes
+#
+# Default:    64
+# Data Type:  Integer
+# Mutability: FIXED
+# 
+#storage.cassandra.compression-block-size=64
+{% if titandb_storage_cassandra_compression_block_size is defined %}
+storage.cassandra.compression-block-size={{ titandb_storage_cassandra_compression_block_size }}
+{% endif %}
+
+# The sstable_compression value Titan uses when creating column families. This
+# accepts any value allowed by Cassandra’s sstable_compression option. Leave
+# this unset to disable sstable_compression on Titan-created CFs.
+#
+# Default:    LZ4Compressor
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.cassandra.compression-type=LZ4Compressor
+{% if titandb_storage_cassandra_compression_type is defined %}
+storage.cassandra.compression-type={{ titandb_storage_cassandra_compression_type }}
+{% endif %}
+
+# The name of Titan’s keyspace.  It will be created if it does not exist.
+#
+# Default:    titan
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.cassandra.keyspace=titan
+{% if titandb_storage_cassandra_keyspace is defined %}
+storage.cassandra.keyspace={{ titandb_storage_cassandra_keyspace }}
+{% endif %}
+
+# The consistency level of read operations against Cassandra
+#
+# Default:    QUORUM
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.cassandra.read-consistency-level=QUORUM
+{% if titandb_storage_cassandra_read_consistency_level is defined %}
+storage.cassandra.read-consistency-level={{ titandb_storage_cassandra_read_consistency_level }}
+{% endif %}
+
+# The number of data replicas (including the original copy) that should be
+# kept. This is only meaningful for storage backends that natively support data
+# replication.
+#
+# Default:    1
+# Data Type:  Integer
+# Mutability: GLOBAL_OFFLINE
+# 
+#storage.cassandra.replication-factor=1
+{% if titandb_storage_cassandra_replication_factor is defined %}
+storage.cassandra.replication-factor={{ titandb_storage_cassandra_replication_factor }}
+{% endif %}
+
+# The replication strategy to use for Titan keyspace
+#
+# Default:    org.apache.cassandra.locator.SimpleStrategy
+# Data Type:  String
+# Mutability: FIXED
+# 
+#storage.cassandra.replication-strategy-class=org.apache.cassandra.locator.SimpleStrategy
+{% if titandb_storage_cassandra_replication_strategy_class is defined %}
+storage.cassandra.replication-strategy-class={{ titandb_storage_cassandra_replication_strategy_class }}
+{% endif %}
+
+# Replication strategy options, e.g. factor or replicas per datacenter.  This
+# list is interpreted as a map.  It must have an even number of elements in
+# [key,val,key,val,…] form.  A replication_factor set here takes precedence
+# over one set with storage.cassandra.replication-factor
+#
+# Default:    (no default value)
+# Data Type:  String[]
+# Mutability: FIXED
+# 
+#storage.cassandra.replication-strategy-options=(no default value)
+{% if titandb_storage_cassandra_replication_strategy_options is defined %}
+storage.cassandra.replication-strategy-options={{ titandb_storage_cassandra_replication_strategy_options }}
+{% endif %}
+
+# The consistency level of write operations against Cassandra
+#
+# Default:    QUORUM
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.cassandra.write-consistency-level=QUORUM
+{% if titandb_storage_cassandra_write_consistency_level is defined %}
+storage.cassandra.write-consistency-level={{ titandb_storage_cassandra_write_consistency_level }}
+{% endif %}
+
+
+#
+# == storage.cassandra.astyanax ==
+#
+
+# Default name for the Cassandra cluster
+#
+# Default:    Titan Cluster
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.cluster-name=Titan Cluster
+{% if titandb_storage_cassandra_astyanax_cluster_name is defined %}
+storage.cassandra.astyanax.cluster-name={{ titandb_storage_cassandra_astyanax_cluster_name }}
+{% endif %}
+
+# Astyanax’s connection pooler implementation
+#
+# Default:    TOKEN_AWARE
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.connection-pool-type=TOKEN_AWARE
+{% if titandb_storage_cassandra_astyanax_connection_pool_type is defined %}
+storage.cassandra.astyanax.connection-pool-type={{ titandb_storage_cassandra_astyanax_connection_pool_type }}
+{% endif %}
+
+# Host supplier to use when discovery type is set to DISCOVERY_SERVICE or
+# TOKEN_AWARE
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.host-supplier=(no default value)
+{% if titandb_storage_cassandra_astyanax_host_supplier is defined %}
+storage.cassandra.astyanax.host-supplier={{ titandb_storage_cassandra_astyanax_host_supplier }}
+{% endif %}
+
+# Maximum pooled "cluster" connections per host
+#
+# Default:    3
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.max-cluster-connections-per-host=3
+{% if titandb_storage_cassandra_astyanax_max_cluster_connections_per_host is defined %}
+storage.cassandra.astyanax.max-cluster-connections-per-host={{ titandb_storage_cassandra_astyanax_max_cluster_connections_per_host }}
+{% endif %}
+
+# Maximum open connections allowed in the pool (counting all hosts)
+#
+# Default:    -1
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.max-connections=-1
+{% if titandb_storage_cassandra_astyanax_max_connections is defined %}
+storage.cassandra.astyanax.max-connections={{ titandb_storage_cassandra_astyanax_max_connections }}
+{% endif %}
+
+# Maximum pooled connections per host
+#
+# Default:    32
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.max-connections-per-host=32
+{% if titandb_storage_cassandra_astyanax_max_connections_per_host is defined %}
+storage.cassandra.astyanax.max-connections-per-host={{ titandb_storage_cassandra_astyanax_max_connections_per_host }}
+{% endif %}
+
+# Maximum number of operations allowed per connection before the connection is
+# closed
+#
+# Default:    100000
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.max-operations-per-connection=100000
+{% if titandb_storage_cassandra_astyanax_max_operations_per_connection is defined %}
+storage.cassandra.astyanax.max-operations-per-connection={{ titandb_storage_cassandra_astyanax_max_operations_per_connection }}
+{% endif %}
+
+# How Astyanax discovers Cassandra cluster nodes
+#
+# Default:    RING_DESCRIBE
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.node-discovery-type=RING_DESCRIBE
+{% if titandb_storage_cassandra_astyanax_node_discovery_type is defined %}
+storage.cassandra.astyanax.node-discovery-type={{ titandb_storage_cassandra_astyanax_node_discovery_type }}
+{% endif %}
+
+# Astyanax’s retry backoff strategy with configuration parameters
+#
+# Default:    com.netflix.astyanax.connectionpool.impl.FixedRetryBackoffStrategy,1000,5000
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.retry-backoff-strategy=com.netflix.astyanax.connectionpool.impl.FixedRetryBackoffStrategy,1000,5000
+{% if titandb_storage_cassandra_astyanax_retry_backoff_strategy is defined %}
+storage.cassandra.astyanax.retry-backoff-strategy={{ titandb_storage_cassandra_astyanax_retry_backoff_strategy }}
+{% endif %}
+
+# Astyanax’s connection pool "retryDelaySlice" parameter
+#
+# Default:    10000
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.retry-delay-slice=10000
+{% if titandb_storage_cassandra_astyanax_retry_delay_slice is defined %}
+storage.cassandra.astyanax.retry-delay-slice={{ titandb_storage_cassandra_astyanax_retry_delay_slice }}
+{% endif %}
+
+# Astyanax’s connection pool "retryMaxDelaySlice" parameter
+#
+# Default:    10
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.retry-max-delay-slice=10
+{% if titandb_storage_cassandra_astyanax_retry_max_delay_slice is defined %}
+storage.cassandra.astyanax.retry-max-delay-slice={{ titandb_storage_cassandra_astyanax_retry_max_delay_slice }}
+{% endif %}
+
+# Astyanax’s retry policy implementation with configuration parameters
+#
+# Default:    com.netflix.astyanax.retry.BoundedExponentialBackoff,100,25000,8
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.retry-policy=com.netflix.astyanax.retry.BoundedExponentialBackoff,100,25000,8
+{% if titandb_storage_cassandra_astyanax_retry_policy is defined %}
+storage.cassandra.astyanax.retry-policy={{ titandb_storage_cassandra_astyanax_retry_policy }}
+{% endif %}
+
+# Astyanax’s connection pool "retryMaxDelaySlice" parameter
+#
+# Default:    20000
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.astyanax.retry-suspend-window=20000
+{% if titandb_storage_cassandra_astyanax_retry_suspend_window is defined %}
+storage.cassandra.astyanax.retry-suspend-window={{ titandb_storage_cassandra_astyanax_retry_suspend_window }}
+{% endif %}
+
+
+#
+# == storage.cassandra.ssl ==
+#
+
+# Controls use of the SSL connection to Cassandra
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: LOCAL
+# 
+#storage.cassandra.ssl.enabled=false
+{% if titandb_storage_cassandra_ssl_enabled is defined %}
+storage.cassandra.ssl.enabled={{ titandb_storage_cassandra_ssl_enabled }}
+{% endif %}
+
+
+#
+# == storage.cassandra.ssl.truststore ==
+#
+
+# Marks the location of the SSL Truststore.
+#
+# Default:     
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.cassandra.ssl.truststore.location= 
+{% if titandb_storage_cassandra_ssl_truststore_location is defined %}
+storage.cassandra.ssl.truststore.location={{ titandb_storage_cassandra_ssl_truststore_location }}
+{% endif %}
+
+# The password to access SSL Truststore.
+#
+# Default:     
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.cassandra.ssl.truststore.password= 
+{% if titandb_storage_cassandra_ssl_truststore_password is defined %}
+storage.cassandra.ssl.truststore.password={{ titandb_storage_cassandra_ssl_truststore_password }}
+{% endif %}
+
+
+#
+# == storage.cassandra.thrift ==
+#
+
+# The thrift frame size in mega bytes
+#
+# Default:    15
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.frame-size=15
+{% if titandb_storage_cassandra_thrift_frame_size is defined %}
+storage.cassandra.thrift.frame-size={{ titandb_storage_cassandra_thrift_frame_size }}
+{% endif %}
+
+
+#
+# == storage.cassandra.thrift.cpool ==
+#
+
+# Approximate number of milliseconds between runs of the idle connection
+# evictor.  Set to -1 to never run the idle connection evictor.
+#
+# Default:    30000
+# Data Type:  Long
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.evictor-period=30000
+{% if titandb_storage_cassandra_thrift_cpool_evictor_period is defined %}
+storage.cassandra.thrift.cpool.evictor-period={{ titandb_storage_cassandra_thrift_cpool_evictor_period }}
+{% endif %}
+
+# Whether the idle connection evictor validates idle connections and drops
+# those that fail to validate
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.idle-test=false
+{% if titandb_storage_cassandra_thrift_cpool_idle_test is defined %}
+storage.cassandra.thrift.cpool.idle-test={{ titandb_storage_cassandra_thrift_cpool_idle_test }}
+{% endif %}
+
+# When the value is negative, e.g. -n, roughly one nth of the idle connections
+# are tested per run.  When the value is positive, e.g. n, the min(idle-count,
+# n) connections are tested per run.
+#
+# Default:    0
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.idle-tests-per-eviction-run=0
+{% if titandb_storage_cassandra_thrift_cpool_idle_tests_per_eviction_run is defined %}
+storage.cassandra.thrift.cpool.idle-tests-per-eviction-run={{ titandb_storage_cassandra_thrift_cpool_idle_tests_per_eviction_run }}
+{% endif %}
+
+# Maximum number of concurrently in-use connections (-1 to leave undefined)
+#
+# Default:    16
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.max-active=16
+{% if titandb_storage_cassandra_thrift_cpool_max_active is defined %}
+storage.cassandra.thrift.cpool.max-active={{ titandb_storage_cassandra_thrift_cpool_max_active }}
+{% endif %}
+
+# Maximum number of concurrently idle connections (-1 to leave undefined)
+#
+# Default:    4
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.max-idle=4
+{% if titandb_storage_cassandra_thrift_cpool_max_idle is defined %}
+storage.cassandra.thrift.cpool.max-idle={{ titandb_storage_cassandra_thrift_cpool_max_idle }}
+{% endif %}
+
+# Max number of allowed Thrift connections, idle or active (-1 to leave
+# undefined)
+#
+# Default:    -1
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.max-total=-1
+{% if titandb_storage_cassandra_thrift_cpool_max_total is defined %}
+storage.cassandra.thrift.cpool.max-total={{ titandb_storage_cassandra_thrift_cpool_max_total }}
+{% endif %}
+
+# Maximum number of milliseconds to block when
+# storage.cassandra.thrift.cpool.when-exhausted is set to BLOCK.  Has no effect
+# when set to actions besides BLOCK.  Set to -1 to wait indefinitely.
+#
+# Default:    -1
+# Data Type:  Long
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.max-wait=-1
+{% if titandb_storage_cassandra_thrift_cpool_max_wait is defined %}
+storage.cassandra.thrift.cpool.max-wait={{ titandb_storage_cassandra_thrift_cpool_max_wait }}
+{% endif %}
+
+# Minimum number of milliseconds a connection must be idle before it is
+# eligible for eviction.  See also
+# storage.cassandra.thrift.cpool.evictor-period.  Set to -1 to never evict idle
+# connections.
+#
+# Default:    60000
+# Data Type:  Long
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.min-evictable-idle-time=60000
+{% if titandb_storage_cassandra_thrift_cpool_min_evictable_idle_time is defined %}
+storage.cassandra.thrift.cpool.min-evictable-idle-time={{ titandb_storage_cassandra_thrift_cpool_min_evictable_idle_time }}
+{% endif %}
+
+# Minimum number of idle connections the pool attempts to maintain
+#
+# Default:    0
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.min-idle=0
+{% if titandb_storage_cassandra_thrift_cpool_min_idle is defined %}
+storage.cassandra.thrift.cpool.min-idle={{ titandb_storage_cassandra_thrift_cpool_min_idle }}
+{% endif %}
+
+# What to do when clients concurrently request more active connections than
+# are allowed by the pool.  The value must be one of BLOCK, FAIL, or GROW.
+#
+# Default:    BLOCK
+# Data Type:  PoolExhaustedAction
+# Mutability: MASKABLE
+# 
+#storage.cassandra.thrift.cpool.when-exhausted=BLOCK
+{% if titandb_storage_cassandra_thrift_cpool_when_exhausted is defined %}
+storage.cassandra.thrift.cpool.when-exhausted={{ titandb_storage_cassandra_thrift_cpool_when_exhausted }}
+{% endif %}
+
+
+#
+# == storage.hbase ==
+#
+
+# The package and class name of the HBaseCompat implementation. HBaseCompat
+# masks version-specific HBase API differences. When this option is unset,
+# Titan calls HBase’s VersionInfo.getVersion() and loads the matching compat
+# class at runtime.  Setting this option forces Titan to instead reflectively
+# load and instantiate the specified class.
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.hbase.compat-class=(no default value)
+{% if titandb_storage_hbase_compat_class is defined %}
+storage.hbase.compat-class={{ titandb_storage_hbase_compat_class }}
+{% endif %}
+
+# An HBase Compression.Algorithm enum string which will be applied to newly
+# created column families. The compression algorithm must be installed and
+# available on the HBase cluster.  Titan cannot install and configure new
+# compression algorithms on the HBase cluster by itself.
+#
+# Default:    GZ
+# Data Type:  String
+# Mutability: MASKABLE
+# 
+#storage.hbase.compression-algorithm=GZ
+{% if titandb_storage_hbase_compression_algorithm is defined %}
+storage.hbase.compression-algorithm={{ titandb_storage_hbase_compression_algorithm }}
+{% endif %}
+
+# The number of initial regions set when creating Titan’s HBase table
+#
+# Default:    (no default value)
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.hbase.region-count=(no default value)
+{% if titandb_storage_hbase_region_count is defined %}
+storage.hbase.region-count={{ titandb_storage_hbase_region_count }}
+{% endif %}
+
+# The number of regions per regionserver to set when creating Titan’s HBase
+# table
+#
+# Default:    (no default value)
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.hbase.regions-per-server=(no default value)
+{% if titandb_storage_hbase_regions_per_server is defined %}
+storage.hbase.regions-per-server={{ titandb_storage_hbase_regions_per_server }}
+{% endif %}
+
+# Whether to shorten the names of Titan’s column families to one-character
+# mnemonics to conserve storage space
+#
+# Default:    true
+# Data Type:  Boolean
+# Mutability: FIXED
+# 
+#storage.hbase.short-cf-names=true
+{% if titandb_storage_hbase_short_cf_names is defined %}
+storage.hbase.short-cf-names={{ titandb_storage_hbase_short_cf_names }}
+{% endif %}
+
+# Assume that Titan’s HBase table and column families already exist. When this
+# is true, Titan will not check for the existence of its table/CFs, nor will it
+# attempt to create them under any circumstances.  This is useful when running
+# Titan without HBase admin privileges.
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#storage.hbase.skip-schema-check=false
+{% if titandb_storage_hbase_skip_schema_check is defined %}
+storage.hbase.skip-schema-check={{ titandb_storage_hbase_skip_schema_check }}
+{% endif %}
+
+# The name of the table Titan will use.  When storage.hbase.skip-schema-check
+# is false, Titan will automatically create this table if it does not already
+# exist.
+#
+# Default:    titan
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.hbase.table=titan
+{% if titandb_storage_hbase_table is defined %}
+storage.hbase.table={{ titandb_storage_hbase_table }}
+{% endif %}
+
+
+#
+# == storage.lock ==
+#
+
+# Locker type to use
+#
+# Default:    consistentkey
+# Data Type:  String
+# Mutability: GLOBAL_OFFLINE
+# 
+#storage.lock.backend=consistentkey
+{% if titandb_storage_lock_backend is defined %}
+storage.lock.backend={{ titandb_storage_lock_backend }}
+{% endif %}
+
+# Whether to delete expired locks from the storage backend
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#storage.lock.clean-expired=false
+{% if titandb_storage_lock_clean_expired is defined %}
+storage.lock.clean-expired={{ titandb_storage_lock_clean_expired }}
+{% endif %}
+
+# Number of milliseconds the system waits for a lock application to be
+# acknowledged by the storage backend
+#
+# Default:    300000 ms
+# Data Type:  Duration
+# Mutability: GLOBAL_OFFLINE
+# 
+#storage.lock.expiry-time=300000 ms
+{% if titandb_storage_lock_expiry_time is defined %}
+storage.lock.expiry-time={{ titandb_storage_lock_expiry_time }}
+{% endif %}
+
+# This option determines the LocalLockMediator instance used for early
+# detection of lock contention between concurrent Titan graph instances within
+# the same process which are connected to the same storage backend.  Titan
+# instances that have the same value for this variable will attempt to discover
+# lock contention among themselves in memory before proceeding with the
+# general-case distributed locking code.  Titan generates an appropriate
+# default value for this option at startup.  Overridding the default is
+# generally only useful in testing.
+#
+# Default:    (no default value)
+# Data Type:  String
+# Mutability: LOCAL
+# 
+#storage.lock.local-mediator-group=(no default value)
+{% if titandb_storage_lock_local_mediator_group is defined %}
+storage.lock.local-mediator-group={{ titandb_storage_lock_local_mediator_group }}
+{% endif %}
+
+# Number of times the system attempts to acquire a lock before giving up and
+# throwing an exception
+#
+# Default:    3
+# Data Type:  Integer
+# Mutability: MASKABLE
+# 
+#storage.lock.retries=3
+{% if titandb_storage_lock_retries is defined %}
+storage.lock.retries={{ titandb_storage_lock_retries }}
+{% endif %}
+
+# Number of milliseconds the system waits for a lock application to be
+# acknowledged by the storage backend
+#
+# Default:    100 ms
+# Data Type:  Duration
+# Mutability: GLOBAL_OFFLINE
+# 
+#storage.lock.wait-time=100 ms
+{% if titandb_storage_lock_wait_time is defined %}
+storage.lock.wait-time={{ titandb_storage_lock_wait_time }}
+{% endif %}
+
+#
+# == tx ==
+#
+
+# Whether transaction mutations should be logged to Titan’s write-ahead
+# transaction log which can be used for recovery of partially failed
+# transactions
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: GLOBAL
+# 
+#tx.log-tx=false
+{% if titandb_tx_log_tx is defined %}
+tx.log-tx={{ titandb_tx_log_tx }}
+{% endif %}
+
+# Maximum time (in ms) that a transaction might take to commit against all
+# backends. This is used by the distributed write-ahead log processing to
+# determine when a transaction can be considered failed (i.e. after this time
+# has elapsed).Must be longer than the maximum allowed write time.
+#
+# Default:    10000 ms
+# Data Type:  StandardDuration
+# Mutability: GLOBAL
+# 
+#tx.max-commit-time=10000 ms
+{% if titandb_tx_max_commit_time is defined %}
+tx.max-commit-time={{ titandb_tx_max_commit_time }}
+{% endif %}
+
+
+#
+# == tx.recovery ==
+#
+
+# Whether the transaction recovery system should print recovered transactions
+# and other activity to standard output
+#
+# Default:    false
+# Data Type:  Boolean
+# Mutability: MASKABLE
+# 
+#tx.recovery.verbose=false
+{% if titandb_tx_recovery_verbose is defined %}
+tx.recovery.verbose={{ titandb_tx_recovery_verbose }}
+{% endif %}

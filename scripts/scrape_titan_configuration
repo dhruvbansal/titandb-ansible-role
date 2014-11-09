@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
+
+# Useful script for scraping the following URL
+#
+#   http://s3.thinkaurelius.com/docs/titan/current/titan-config-ref.html#_log
+#
+# and turning its contents into a template that can be used to
+# configure TitanDB.
+#
+# The output of this script needs post-processing...
+
+require 'open-uri'
+require 'nokogiri'
+
+def commentify!(string, wrap_len=78)
+  string.insert(0, "# ")
+  start_pos = wrap_len
+  while start_pos < string.length
+    sp = string.rindex(' ', start_pos)
+    string.insert(sp, '|')
+    start_pos = sp + wrap_len + 1
+  end
+  string.gsub!(/\|[\s]/, "\n# ")
+end
+
+def ansiblize(titandb_option)
+  "titandb_#{titandb_option.tr('-', '_').tr('.','_')}"
+end
+
+doc = Nokogiri::HTML(open("http://s3.thinkaurelius.com/docs/titan/current/titan-config-ref.html").read())
+  
+sections = Hash[doc.css(".section").map do |section|
+  title = section.css("h3").inner_text.split(' ').last.to_s.strip
+  [title, section] unless title.empty?
+end.compact]
+
+sections.keys.sort.each do |title|
+  section = sections[title]
+  puts <<TITLE
+
+#
+# == #{title} ==
+#
+
+TITLE
+  section.css('tbody tr').each do |row|
+    titandb_option, description, data_type, default_value, mutability, *_ = row.css("td").map { |field| field.inner_text }
+    ansible_option = ansiblize(titandb_option)
+    commentify!(description,78)
+    puts <<CONFIG
+#{description}
+#
+# Default:    #{default_value}
+# Data Type:  #{data_type}
+# Mutability: #{mutability}
+# 
+##{titandb_option}=#{default_value}
+{% if #{ansible_option} is defined %}
+#{titandb_option}={{ #{ansible_option} }}
+{% endif %}
+
+CONFIG
+  end
+end
